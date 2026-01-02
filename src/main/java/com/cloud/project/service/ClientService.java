@@ -2,6 +2,7 @@ package com.cloud.project.service;
 
 import ch.qos.logback.core.net.server.Client;
 import com.cloud.project.entity.ClientEntity;
+import com.cloud.project.exception.ClientNotFoundException;
 import com.cloud.project.exception.InvalidFileTypeException;
 import com.cloud.project.repository.ClientJpaRepository;
 import com.cloud.project.s3.S3Service;
@@ -15,6 +16,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,20 +28,28 @@ public class ClientService {
         return repository.save(clientData);
     }
 
-    public ClientEntity getClientById(Long clientId){
-        return repository.findById(clientId).orElse(null);
+    public ResponseEntity<Object> getClientById(Long clientId){
+        Optional<ClientEntity> clientSaved = repository.findById(clientId);
+        if(clientSaved.isPresent()){
+            return ResponseEntity.ok(clientSaved);
+        }
+        return new ResponseEntity<>(new ClientNotFoundException("Client not found with id: " + clientId), HttpStatus.NOT_FOUND);
     }
 
-    public List<ClientEntity> getAllClients(){
-        return repository.findAll();
+    public ResponseEntity<List<ClientEntity>> getAllClients(){
+        return ResponseEntity.ok(repository.findAll());
     }
 
-    public String deleteClient(Long clientId){
+    public ResponseEntity<Object> deleteClient(Long clientId){
+        Optional<ClientEntity> clientSaved = repository.findById(clientId);
+        if(!clientSaved.isPresent()){
+            return new ResponseEntity<>(new ClientNotFoundException("Client not found with id: " + clientId), HttpStatus.NOT_FOUND);
+        }
         repository.deleteById(clientId);
-        return "Client deleted successfully!";
+        return ResponseEntity.ok("Client deleted successfully!");
     }
 
-    public Object updateClient(ClientEntity newVersionClient){
+    public ResponseEntity<Object> updateClient(ClientEntity newVersionClient){
         ClientEntity clientSaved = repository.findById(newVersionClient.getId())
                 .orElse(null);
 
@@ -48,10 +58,10 @@ public class ClientService {
             clientSaved.setFirstname(newVersionClient.getFirstname());
             clientSaved.setLastName(newVersionClient.getLastName());
 
-            return repository.save(clientSaved);
+            return ResponseEntity.ok(repository.save(clientSaved));
         }
 
-        return "Client not found with id: " + newVersionClient.getId();
+        return new ResponseEntity<>(new ClientNotFoundException("Client not found with id: " + newVersionClient.getId()), HttpStatus.NOT_FOUND);
 
     }
 

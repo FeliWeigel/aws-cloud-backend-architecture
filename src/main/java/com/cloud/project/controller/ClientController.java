@@ -19,7 +19,7 @@ public class ClientController {
     private final ClientService clientService;
 
     @GetMapping("/all")
-    public List<ClientEntity> listAllClients() {
+    public ResponseEntity<List<ClientEntity>> listAllClients() {
         return clientService.getAllClients();
     }
 
@@ -29,17 +29,17 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
-    public ClientEntity getClientById(@PathVariable("id") Long id) {
+    public ResponseEntity<Object> getClientById(@PathVariable("id") Long id) {
         return clientService.getClientById(id);
     }
 
     @DeleteMapping("/delete/{id}")
-    public String deleteClient(@PathVariable("id") Long id) {
+    public ResponseEntity<Object> deleteClient(@PathVariable("id") Long id) {
         return clientService.deleteClient(id);
     }
 
     @PutMapping("/update/{id}")
-    public Object updateClient(
+    public ResponseEntity<Object> updateClient(
             @PathVariable("id") Long id,
             @RequestBody ClientEntity clientUpdated
     ) {
