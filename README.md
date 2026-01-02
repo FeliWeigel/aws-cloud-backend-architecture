@@ -59,14 +59,14 @@ The deployment uses the following AWS services:
 
 The application relies entirely on environment variables.
 
-- **Local development**: provided via `.env`
+- **Local development**: provided via `.env.example`
 - **Production**: provided via **ECS Task Definition**
 
 No AWS credentials are stored in the codebase or repository.
 
 An example environment file is provided:
 
-```env
+```env example
 # Application
 SPRING_PROFILES_ACTIVE=local
 SERVER_PORT=8080
